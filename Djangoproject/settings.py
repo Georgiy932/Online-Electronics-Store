@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +24,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u$_o(9ls^+i+pe^xd9!q5tjjw+556c$enb!$_f2px)v9qnu3$0'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 
 
@@ -102,14 +102,12 @@ WSGI_APPLICATION = 'Djangoproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Shop',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        },
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
+        'OPTIONS': {'client_encoding': 'UTF8'},
     }
 }
 
@@ -159,9 +157,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'phones/static'),
 ]
 
-LIQPAY_PUBLIC_KEY = 'sandbox_i31524788941'
-LIQPAY_PRIVATE_KEY = 'sandbox_wJUI486Y8hme9DToV7KOulOgjJ7228hwRaESl3d9'
-LIQPAY_SANDBOX = True  # False — если уже боевой режим
+LIQPAY_PUBLIC_KEY = os.getenv("LIQPAY_PUBLIC_KEY")
+LIQPAY_PRIVATE_KEY = os.getenv("LIQPAY_PRIVATE_KEY")
+LIQPAY_SANDBOX = os.getenv("LIQPAY_SANDBOX", "True") == "True"  # False — если уже боевой режим
 
 LOGGING = {
     'version': 1,
@@ -184,5 +182,6 @@ LOGGING = {
     },
 }
 
-API_KEY = "685c17a7b9d856b46c31565fab135897"
-NP_API_URL = 'https://api.novaposhta.ua/v2.0/json/'
+
+API_KEY = os.getenv("NOVA_POSHTA_API_KEY")
+NP_API_URL = os.getenv("NP_API_URL")
