@@ -1,0 +1,47 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block content %}
+
+<h2 class="orders-title">Your Orders</h2>
+
+
+{% if orders %}
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Products</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Payment Status</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>
+                {% for product in order.products.all %}
+                    {{ product.name }} ({{ product.price }}$)<br>
+                {% endfor %}
+            </td>
+            <td>{{ order.total_price }}$</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>{{ order.created_at }}</td>
+            <td>
+                {% if order.is_paid %}
+                    <span style="color: green; font-weight: bold;">Paid</span> ✅
+                {% else %}
+                    <span style="color: red;">Unpaid</span>
+                    <br>
+                    <a href="{% url 'generate_payment_form' order_id=order.id %}" class="btn btn-sm btn-primary" style="margin-top: 5px;">
+                        Pay Now
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>You have no orders yet.</p>
+{% endif %}
+
+{% endblock %}

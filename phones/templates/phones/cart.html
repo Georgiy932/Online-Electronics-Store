@@ -1,0 +1,44 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block content %}
+<h2 class="cart-title">Your Cart</h2>
+
+
+{% if cart.cart_items.all %}
+    <table class="cart-table">
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+        {% for item in cart.cart_items.all %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.price }}$</td>
+            <td>
+                <a href="{% url 'remove_from_cart' item.product.id %}" class="btn-minus">-</a>
+                <span class="quantity">{{ item.quantity }}</span>
+                <a href="{% url 'add_to_cart' item.product.id %}" class="btn-plus">+</a>
+            </td>
+            <td>{{ item.total_price }}$</td>
+            <td>
+                <a href="{% url 'remove_from_cart' item.product.id %}" class="btn-remove">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="cart-total">
+        <strong>Total:</strong> {{ cart.total_price }}$
+    </div>
+    <a href="{% url 'clear_cart' %}" class="btn-clear">Clear Cart</a>
+    <a href="{% url 'checkout' %}" class="btn-checkout">Place an Order</a>
+{% else %}
+    <p>Your cart is empty.</p>
+{% endif %}
+
+<a href="/" class="btn-continue">Continue Shopping</a>
+
+{% endblock %}
+

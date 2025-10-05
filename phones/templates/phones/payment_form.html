@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+
+{% block content %}
+<div class="payment-container">
+    <h2>Online Payment</h2>
+
+    <p>Thank you, {{ full_name }}! You selected online payment.</p>
+
+    <!-- Здесь можно будет добавить форму оплаты от LiqPay -->
+    <form method="post" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
+        <input type="hidden" name="data" value="{{ data }}">
+        <input type="hidden" name="signature" value="{{ signature }}">
+        <button type="submit" class="btn btn-success">Pay Now</button>
+    </form>
+
+    <a href="{% url 'cart_view' %}" class="btn btn-secondary">Back to cart</a>
+</div>
+{% endblock %}
+

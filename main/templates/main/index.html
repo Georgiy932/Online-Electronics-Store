@@ -1,0 +1,49 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}
+Pixel Point
+{% endblock %}
+
+{% block content %}
+    <div class="features">
+        <h1>{{ title }}</h1>
+        <p>The Pixel Point electronics store specializes in selling only new products from leading global brands such as Apple, Samsung, Google, and others. Our assortment includes smartphones, tablets, laptops, smart gadgets, and accessories. The store is committed to providing high-quality service, offering customers the latest models, official warranties, and convenient purchasing conditions.</p>
+
+
+        {% for el in values %}
+            {% if el == 'So' %}
+                {% filter upper %}
+            <p>{{ el }}</p>
+                {% endfilter %}
+            {% endif %}
+        {% endfor %}
+
+        {% for el in obj %}
+        <p>{{ el }}</p>
+        {% endfor %}
+
+        <div class="slider">
+            <img src="{% static 'main/img/pp_slide1.png' %}" class="slide active">
+            <img src="{% static 'main/img/pp_slide2.png' %}" class="slide">
+            <img src="{% static 'main/img/pp_slide3.png' %}" class="slide">
+        </div>
+
+        </div>
+
+
+
+
+        <script>
+            let slides = document.querySelectorAll('.slide');
+            let current = 0;
+
+            function showNextSlide() {
+                slides[current].classList.remove('active');
+                current = (current + 1) % slides.length;
+                slides[current].classList.add('active');
+            }
+
+            setInterval(showNextSlide, 7000); // 7 секунд
+    </script>
+
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'main/layout.html' %}
+
+{% load static %}
+{% block content %}
+<div class="order-container">
+    <h2>Placing an order</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+
+        <p>
+            <label for="id_full_name">Full Name:</label>
+            <input type="text" name="full_name" id="id_full_name" class="short-input" required>
+        </p>
+
+
+        <p>
+            <label for="id_phone">Phone Number:</label>
+            <input type="tel" name="phone" id="id_phone" class="short-input" required>
+        </p>
+
+
+        <p>
+            <label for="id_payment">Payment method:</label>
+            <select name="payment_method" id="id_payment" class="custom-select">
+                <option value="cash">Pay on delivery</option>
+                <option value="online">Pay online</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="id_delivery">Delivery method:</label>
+            <select name="delivery_method" id="id_delivery" class="custom-select">
+                <option value="nova_post">Nova Poshta (branch/postamat)</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="id_city_ref">City:</label>
+            <select id="id_city_ref" name="city_ref" placeholder="Select city..."></select>
+        </p>
+
+        <p>
+            <label for="id_warehouse_ref">Branch:</label>
+            <select id="id_warehouse_ref" name="warehouse_ref" placeholder="Select branch..."></select>
+        </p>
+
+
+        <button type="submit" class="btn btn-success">Confirm order</button>
+    </form>
+
+    <a href="{% url 'cart_view' %}" class="btn btn-secondary">Back to cart</a>
+</div>
+
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- Телефон ---
+        const phoneInput = document.querySelector("#id_phone");
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "ua",
+            preferredCountries: ["ua", "pl", "us"],
+            separateDialCode: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+        });
+
+        document.querySelector("form").addEventListener("submit", function (e) {
+            if (!iti.isValidNumber()) {
+                e.preventDefault();
+                alert("Пожалуйста, введите корректный номер телефона.");
+                phoneInput.focus();
+            }
+        });
+
+        // --- Tom Select: отделения ---
+        const warehouseSelect = new TomSelect("#id_warehouse_ref", {
+            valueField: "value",
+            labelField: "text",
+            searchField: "text",
+            placeholder: "Select department...",
+            disabled: true,
+            load: function(query, callback) {
+                // Ничего не делаем здесь — загрузка идёт через onChange у города
+                callback();
+            }
+        });
+
+        // --- Tom Select: город ---
+        const citySelect = new TomSelect("#id_city_ref", {
+            valueField: "value",
+            labelField: "text",
+            searchField: "text",
+            placeholder: "Start typing city...",
+            load: function(query, callback) {
+                fetch(`/api/nova-poshta/cities/?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const mapped = (data.data || []).map(city => ({
+                            value: city.Ref,
+                            text: city.Description
+                        }));
+                        callback(mapped);
+                    })
+                    .catch(() => callback());
+            },
+            onChange: function(cityRef) {
+                warehouseSelect.clearOptions();
+                warehouseSelect.enable();
+
+                fetch(`/api/nova-poshta/warehouses/?city_ref=${cityRef}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const mapped = (data.data || []).map(dept => ({
+                            value: dept.Ref,
+                            text: dept.Description
+                        }));
+                        warehouseSelect.addOptions(mapped);
+                    })
+                    .catch(() => {});
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Wishlist{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-3">
+    <h2 class="wishlist-title">Your Wishlist</h2>
+
+    {% if wishlist.products.all %}
+        <div class="row g-2"> <!-- Уменьшил расстояние между товарами -->
+            {% for product in wishlist.products.all %}
+                <div class="col-lg-3 col-md-4 col-sm-6">  <!-- 4 товара в ряд -->
+                    <div class="card product-card d-flex flex-column">
+                        <a href="{% url 'product_detail' product.slug %}">
+                            <div class="product-image-container">
+                                <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title product-title">{{ product.name }}</h5>
+                            <p class="text-success fw-bold text-center mt-auto price">{{ product.price }} $</p>
+
+                            <!-- Кнопка удаления из Wishlist -->
+                            <form action="{% url 'remove_from_wishlist' product.id %}" method="post" class="w-100">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger wishlist-btn w-100">
+                                    <i class="fa-solid fa-heart-broken"></i> Remove
+                                </button>
+                            </form>
+
+                            <!-- Кнопки "Buy Now" и "Add to Cart" -->
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-primary w-50">Buy Now</button>
+                                <button class="btn btn-success w-50">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p class="text-muted">Your wishlist is empty.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CSS стили -->
+<style>
+    /* Контейнер карточки */
+    .product-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        padding-bottom: 10px;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Контейнер для изображения с фиксированной высотой */
+    .product-image-container {
+        width: 100%;
+        height: 250px; /* Одинаковая высота блока */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    /* Изображение товара */
+    .product-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    /* Название товара */
+    .product-title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        min-height: 50px; /* Одинаковая высота заголовка */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Цена товара */
+    .price {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    /* Кнопка удаления */
+    .wishlist-btn {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+
+    /* Настройка количества колонок */
+    @media (min-width: 1200px) { /* Для больших экранов (≥1200px) */
+        .col-lg-3 {
+            flex: 0 0 24%;
+            max-width: 24%;
+        }
+    }
+
+    @media (min-width: 992px) and (max-width: 1199px) { /* Для средних экранов (992-1199px) */
+        .col-md-4 {
+            flex: 0 0 32%;
+            max-width: 32%;
+        }
+    }
+
+    @media (max-width: 991px) { /* Для мобильных устройств */
+        .col-sm-6 {
+            flex: 0 0 49%;
+            max-width: 49%;
+        }
+    }
+
+    @media (max-width: 575px) { /* Для маленьких экранов */
+        .col-sm-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+
+
+
+
+
+

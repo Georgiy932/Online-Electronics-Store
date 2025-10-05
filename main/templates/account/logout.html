@@ -1,0 +1,14 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+
+{% if not user.is_authenticated %}
+    <p>You have been logged out.</p>
+    <a href="{% url 'login' %}" class="btn btn-primary">Login again</a>
+{% else %}
+    <p>Error: Still logged in!</p>
+{% endif %}
+
+{% endblock %}

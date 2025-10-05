@@ -1,0 +1,130 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@17.0.19/build/css/intlTelInput.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+</head>
+
+<body>
+<!-- Горизонтальная навигация -->
+<header>
+    <div class="logo">
+        <a href="{% url 'home' %}" class="text-decoration-none text-danger fw-bold">Pixel Point</a>
+    </div>
+
+    <!-- Поле поиска -->
+    <form class="d-flex" action="{% url 'product_search' %}" method="GET" style="width: 40%;">
+        <input type="text" class="form-control me-2" name="q" placeholder="Search for products..." required>
+        <button class="btn btn-outline-light" type="submit"><i class="fa-solid fa-search"></i></button>
+    </form>
+
+    <ul class="nav">
+        <li><a href="{% url 'home' %}"><i class="fa-solid fa-house-chimney"></i> Home</a></li>
+        <li><a href="{% url 'about' %}"><i class="fa-solid fa-question"></i> About us</a></li>
+        <li><a href="{% url 'contact' %}"><i class="fa-solid fa-phone"></i> Contacts</a></li>
+        <li><a href="{% url 'wishlist' %}"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
+        <li>
+            <a href="{% url 'cart_view' %}?next={{ request.path }}">
+                <i class="fa-solid fa-cart-shopping"></i> Cart
+            </a>
+        </li>
+
+        <!-- Кнопка "Account" с выпадающим меню -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-user"></i> Account
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                {% if user.is_authenticated %}
+                    <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fa-solid fa-box"></i> Order History</a></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a class="dropdown-item" href="{% url 'login' %}"><i class="fa-solid fa-sign-in"></i> Login</a></li>
+                    <li><a class="dropdown-item" href="{% url 'register' %}"><i class="fa-solid fa-user-plus"></i> Register</a></li>
+                {% endif %}
+            </ul>
+        </li>
+    </ul>
+</header>
+
+
+    <main class="d-flex">
+        {% if not hide_categories %}
+            <aside class="sidebar" style="width: 15%;">
+                <h3>Categories</h3>
+                <ul class="list-group">
+                 {% for category in categories %}
+                     <li class="list-group-item {% if current_category and current_category.slug == category.slug %}active{% endif %}">
+                            <a href="{% url 'product_list_by_category' category.slug %}"
+                                class="text-decoration-none {% if current_category and current_category.slug == category.slug %}text-white{% endif %}">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+        {% endif %}
+
+        <div class="content flex-grow-1">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+
+
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        <p class="mb-0">&copy; 2025 Pixel Point. Made by GAD.</p>
+    </footer>
+</body>
+</html>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".wishlist-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let productId = this.getAttribute("data-product-id");
+
+            fetch(`/wishlist/add/${productId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let dropdownTriggerList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    let dropdownList = dropdownTriggerList.map(function (dropdownTriggerEl) {
+        return new bootstrap.Dropdown(dropdownTriggerEl);
+    });
+});
+
+
+</script>
+
+

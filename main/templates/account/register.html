@@ -1,0 +1,33 @@
+{% extends 'main/layout.html' %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="order-container">
+    <h2>Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 15px;">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                    <div style="color: red; font-size: 14px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+            <div style="color: red; font-size: 14px;">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+    <a href="{% url 'login' %}" class="btn btn-secondary">Already have an account? Login</a>
+</div>
+{% endblock %}
+
+
